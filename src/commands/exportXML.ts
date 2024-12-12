@@ -3,18 +3,15 @@ import path = require("path");
 import * as fs from 'fs';
 import axios from "axios";
 
-const serverName: string = "docker";
-
-const configServer = vscode.workspace.getConfiguration(`intersystems.servers.${serverName.toLowerCase()}`);
+const conn = vscode.workspace.getConfiguration("objectscript.conn");
+const serverName: string = conn.server;
 const proto: string = vscode.workspace.getConfiguration(`intersystems.servers.${serverName.toLowerCase()}.webServer`).get("scheme") || "";
 const host: string = vscode.workspace.getConfiguration(`intersystems.servers.${serverName.toLowerCase()}.webServer`).get("host") || "";
 const port: number = vscode.workspace.getConfiguration(`intersystems.servers.${serverName.toLowerCase()}.webServer`).get("port") || 80;
 const configConn = vscode.workspace.getConfiguration('objectscript.conn');
 const namespace: string = configConn.get("ns") || "";
-const username: string = configServer.get("username") || "_SYSTEM";
-const password: string = configServer.get("password") || "SYS";;
 
-export async function getExportXML(files: vscode.Uri[]): Promise<any> {
+export async function getExportXML(files: vscode.Uri[], username: string, password: string): Promise<any> {
 
     try {
         const list: string[] = [];
@@ -71,6 +68,7 @@ export async function getExportXML(files: vscode.Uri[]): Promise<any> {
             const xml = response.data.xml;
             const filename = response.data.filename;
             
+            // コンソールに出力
             console.log(mess);
 
             const savePath: string = "" + exportDir + "/" + filename;

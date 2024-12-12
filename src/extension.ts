@@ -17,11 +17,30 @@ export function activate(context: vscode.ExtensionContext) {
 		// コマンドはpackage.jsonファイルで定義されています
 		// 次に、registerCommandを使用してコマンドの実装を提供します。
 		// commandIdパラメータはpackage.jsonのコマンドフィールドと一致する必要があります
-		vscode.commands.registerCommand(`${extensionId}.exportXML`, (_file, files) => {
+		vscode.commands.registerCommand(`${extensionId}.exportXML`, async (_file, files) => {
 			// ここに記述したコードはコマンドが実行されるたびに実行されます
 			
+			const conn = vscode.workspace.getConfiguration("objectscript.conn");
+			const serverName: string = conn.server;
+			const configServer = vscode.workspace.getConfiguration(`intersystems.servers.${serverName.toLowerCase()}`);
+			let username: string = configServer.get("username") || "";
+			let password: string = configServer.get("password") || "";
 			const configEXML = vscode.workspace.getConfiguration('objectscript-to-xml');
 			const bundled: boolean = configEXML.get("bundled") || false;
+
+			if (!username) {
+				username = await vscode.window.showInputBox({
+					prompt: 'Please enter your login user name.'
+				}) || "";
+			}
+			if (!password) {
+				password = await vscode.window.showInputBox({
+					prompt: `Please enter your ${username} password.`,
+					placeHolder: `Password for user '${username}' on '${serverName}'`,
+					password: true
+				}) || "";
+			}
+			// prompt: "Optionally use key button above to store password",
 
 			if (files === undefined) {
 				if (_file !== undefined) {
@@ -30,10 +49,10 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			if (bundled) {
-				getExportXML(files);
+				getExportXML(files, username, password);
 			} else {
 				files.map((file: any) => {
-					getExportXML([file]);
+					getExportXML([file], username, password);
 				});
 			}
 		})
