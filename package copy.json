@@ -1,0 +1,106 @@
+{
+  "name": "objectscript-to-xml",
+  "displayName": "ObjectScript to XML",
+  "description": "Exporting InterSystems Object Scripts in XML",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "objectscript-to-xml.exportXML",
+        "title": "ObjectScript Export XML"
+      },
+      {
+        "command": "objectscript-to-xml.exportXMLs",
+        "title": "ObjectScript Export One XML"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "when": "resourceLangId == objectscript-class",
+          "command": "objectscript-to-xml.exportXML",
+          "group": "1_modification"
+        },
+        {
+          "when": "resourceLangId == objectscript-class",
+          "command": "objectscript-to-xml.exportXMLs",
+          "group": "1_modification"
+        }
+      ],
+      "editor/context": [
+        {
+          "when": "resourceLangId == objectscript-class",
+          "command": "objectscript-to-xml.exportXML",
+          "group": "1_modification"
+        },
+        {
+          "when": "resourceLangId == objectscript-class",
+          "command": "objectscript-to-xml.exportXMLs",
+          "group": "1_modification"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "objectscript-to-xml.exportXML",
+        "key": "ctrl+x"
+      }
+    ],
+    "configuration": {
+      "title": "objectscript-to-xml",
+      "properties": {
+        "objectscript-to-xml.applicationName": {
+          "type": "string",
+          "default": "/exml-api",
+          "description": "Specifies the web application name."
+        },
+        "objectscript-to-xml.exportDir": {
+          "type": "string",
+          "default": "export",
+          "description": "Specify the location to save the export file."
+        },
+        "objectscript-to-xml.bundled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Export multiple files into a single XML file."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.9",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.95.0",
+    "@typescript-eslint/eslint-plugin": "^8.10.0",
+    "@typescript-eslint/parser": "^8.7.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.13.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.6.3",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "axios": "^1.7.9"
+  }
+}
