@@ -20,8 +20,8 @@ export async function getExportXML(files: vscode.Uri[]): Promise<any> {
         const list: string[] = [];
         const workspaceFolder = vscode.workspace.getWorkspaceFolder(files[0]);
         const configEXML = vscode.workspace.getConfiguration('objectscript-to-xml');
-        let api: string = configEXML.get("applicationName") || "";
-		let exportDir: string = configEXML.get("exportDir") || "";
+        let api: string = configEXML.get("applicationName") || "/exml-api";
+		let exportDir: string = configEXML.get("exportDir") || "export";
         if (api.substring(0, 1) !== "/") {
             api = "/" + api;
         }
@@ -47,9 +47,9 @@ export async function getExportXML(files: vscode.Uri[]): Promise<any> {
         if (list.length === 0) {
             return;
         }
-
+        
         const body = {
-            file: list,
+            files: list,
             ns: namespace
         };
         
@@ -64,32 +64,30 @@ export async function getExportXML(files: vscode.Uri[]): Promise<any> {
             data: body,
             withCredentials: true,
         };
+        
         const response = await axios.request(request);
         if (response.status === 200) {
-            let mineType = response.headers["content-type"];
-            const name = getFileName(response.headers["content-disposition"]);
+            const mess = response.data.message;
+            const xml = response.data.xml;
+            const filename = response.data.filename;
             
-            //const saveUri = await vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(name) });
-            //console.log(saveUri);
-            const savePath: string = "" + exportDir + "/" + name;
-            console.log(savePath);
+            console.log(mess);
+
+            const savePath: string = "" + exportDir + "/" + filename;
+            
             if (savePath) {
-                fs.writeFileSync(savePath, response.data);
-                vscode.window.showInformationMessage('Export ObjectScript Classes in XML');
+                fs.writeFile(savePath, xml, (err) => {
+                    if (err) {
+                        vscode.window.showErrorMessage(`Failed to save XML file. ${err}`);
+                    } else {
+                        vscode.window.showInformationMessage('Export ObjectScript Classes in XML');
+                    }
+                });
             }
         }
     } catch (error) {
-        //let name: string = path.basename(file.path) || ".";
-        //let message = `Failed to create export file '${name}'.`;
-        const message = "";
-        vscode.window.showErrorMessage(message, "Dismiss");
+        let message = "Failed to create export file.";
+        vscode.window.showErrorMessage(message);
         throw error;
     }
-};
-
-const getFileName = (contentDisposition: string) => {
-    return contentDisposition.substring(
-        contentDisposition.indexOf("filename=") + 9,
-        contentDisposition.length,
-    );
 };
