@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26" zv="IRIS for UNIX (Ubuntu Server LTS for ARM64 Containers) 2023.2 (Build 227U)" ts="2024-12-13 15:16:58">
+<Class name="%Zbii.Redirect">
+<Super>%RegisteredObject</Super>
+<TimeChanged>67185,68681.506502793</TimeChanged>
+<TimeCreated>67185,68681.506502793</TimeCreated>
+
+<Method name="run">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[className:%String,method:%String,&sts,arguments...]]></FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	s io=$io
+	s mnemonic=##class(%Device).GetMnemonicRoutine()
+	s %Stream=##class(%Stream.TmpCharacter).%New()
+	u io::("^"_$zname)
+	s redirect=##class(%Library.Device).ReDirectIO(1)
+	
+	i (sts=1) {
+		s sts=$CLASSMETHOD(className, method, arguments...)
+	} else {
+		d $CLASSMETHOD(className, method, arguments...)
+	}
+	
+	i (mnemonic'="") {
+		u io::("^"_mnemonic)
+	} else {
+		u io
+	}
+	d ##class(%Library.Device).ReDirectIO(redirect)
+	
+	d %Stream.Rewind()
+	
+	s result=""
+	d {
+		s dat=%Stream.Read(.len) q:len<0
+		s result=result_dat
+	} while(len>0)
+	
+	q result
+]]></Implementation>
+</Method>
+
+<Method name="runObj">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[obj:%ObjectHandle,method:%String,&sts,arguments...]]></FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	s io=$io
+	s mnemonic=##class(%Device).GetMnemonicRoutine()
+	s %Stream=##class(%Stream.TmpCharacter).%New()
+	u io::("^"_$zname)
+	s redirect=##class(%Library.Device).ReDirectIO(1)
+	
+	i (sts=1) {
+		s sts=$METHOD(obj, method, arguments...)
+	} else {
+		d $METHOD(obj, method, arguments...)
+	}
+	
+	i (mnemonic'="") {
+		u io::("^"_mnemonic)
+	} else {
+		u io
+	}
+	d ##class(%Library.Device).ReDirectIO(redirect)
+	
+	d %Stream.Rewind()
+	
+	s result=""
+	d {
+		s dat=%Stream.Read(.len) q:len<0
+		s result=result_dat
+	} while(len>0)
+	
+	q result
+]]></Implementation>
+</Method>
+
+<Method name="redirects">
+<ClassMethod>1</ClassMethod>
+<ProcedureBlock>0</ProcedureBlock>
+<Implementation><![CDATA[
+#; Public entry points for redirection
+rstr(len,time)  Quit ""
+rchr(time)      Quit ""
+wstr(s) Do %Stream.Write(s) Quit
+wchr(a) Do %Stream.Write($char(a)) Quit
+wnl Do %Stream.Write($char(13,10)) Quit
+wff Do %Stream.Write($char(13,10,13,10)) Quit
+wtab(n) New chars Set $piece(chars," ",n+1)="" Do %Stream.Write(chars) Quit
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="exml.Commands">
+<Super>%RegisteredObject</Super>
+<TimeChanged>67186,66809.582561387</TimeChanged>
+<TimeCreated>67184,36573.399025595</TimeCreated>
+
+<Method name="exportToXML">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>files:%List,namespace:%String</FormalSpec>
+<ReturnType>%DynamicObject</ReturnType>
+<Implementation><![CDATA[
+    set result = {}
+
+    set fileName = $tr($zdt($h, 8, 1), ": ", "")_"_"_namespace_"_Exports"_".xml"
+    if ($ll(files) = 1) {
+        set fileName = $li(files, 1)_".cls.xml"
+    }
+    
+    set ns = $Namespace
+
+    set items = ""
+    for p=1:1:$ll(files) {
+        set file = $li(files, p)
+        set items(file_".cls") = ""
+    }
+    set stream = ##class(%Stream.GlobalCharacter).%New()
+
+    s sts=0, mess = ""
+
+    zn namespace
+    set mess = ##class(%Zbii.Redirect).run("%SYSTEM.OBJ", "ExportToStream", .sts, .items, stream)
+    zn ns
+    
+    set xmldt = ""
+    while 'stream.AtEnd {
+		set xmldt = xmldt_stream.Read()
+	}
+    
+    set result.message = mess
+    set result.xml = xmldt
+    set result.filename = fileName
+
+    return result
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="exml.webservice.Broker">
+<Super>%CSP.REST</Super>
+<TimeChanged>67186,52432.447952385</TimeChanged>
+<TimeCreated>67184,36378.018425671</TimeCreated>
+
+<Parameter name="CHARSET">
+<Default>UTF-8</Default>
+</Parameter>
+
+<Parameter name="UseSession">
+<Default>1</Default>
+</Parameter>
+
+<Parameter name="GZIPOUTPUT">
+<Default>1</Default>
+</Parameter>
+
+<Parameter name="HandleCorsRequest">
+<Default>1</Default>
+</Parameter>
+
+<Parameter name="CONVERTINPUTSTREAM">
+<Default>1</Default>
+</Parameter>
+
+<XData name="UrlMap">
+<Data><![CDATA[
+<Routes>
+    <Route Url="/exportsXml" Method="POST" Call="exportsXml" Cors="true" />
+</Routes>
+]]></Data>
+</XData>
+
+<Method name="exportsXml">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    set result = $$$OK
+    try {
+        set obj = ##class(%DynamicObject).%FromJSON(%request.Content)
+        set ns = obj.ns
+        set files = "", p = 0
+        set it = obj.files.%GetIterator()
+        while it.%GetNext(.key, .value) {
+            set $li(files, $i(p)) = value
+        }
+        set ret = ##class(exml.Commands).exportToXML(files, ns)
+    } catch e {
+        set ^AhE=e.DisplayString()
+        set result = e.AsStatus()
+    }
+    set %response.ContentType = ..#CONTENTTYPEJSON
+    do ret.%ToJSON()
+    //set %response.ContentType = "text/xml"
+    //do %response.SetHeader("Access-Control-Expose-Headers", "Content-Disposition")
+    //do %response.SetHeader("Content-Disposition", "attachment; filename="_filename)
+	//do stm.OutputToDevice()
+    return result
+]]></Implementation>
+</Method>
+
+<Method name="OnHandleCorsRequest">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pUrl:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tOrigin = $Get(%request.CgiEnvs("HTTP_ORIGIN"))
+    Do ..SetResponseHeaderIfEmpty("Access-Control-Allow-Origin", tOrigin)
+	Do ..SetResponseHeaderIfEmpty("Access-Control-Allow-Credentials", "true")
+
+	Quit ..HandleDefaultCorsRequest(pUrl)
+]]></Implementation>
+</Method>
+
+<Method name="OnPreDispatch">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[pUrl:%String,pMethod:%String,&pContinue:%Boolean]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set p = pUrl
+	if $username="UnknownUser"&&(pMethod'="OPTIONS") {
+		set %response.Status="401 Unauthorized"
+		set pContinue=0
+	}
+
+    return $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>
