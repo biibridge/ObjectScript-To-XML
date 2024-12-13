@@ -14,7 +14,8 @@ When multiple classes are selected, you can export one XML file per class, or al
 * bundled: If this parameter is set to True, multiple selected classes will be bundled into a single XML file and exported.
 
 ## Introduction
-1. From the given repository, download the xml file and import it into any namespace.
+1. Download the xml file from the specified repository below and import it into the namespace of your choice.
+  [import XML file](https://github.com/biibridge/ObjectScript-To-XML/blob/main/importSource/objectscript-to-xml.xml)
 2. Create a web application and specify "exml.webservice.Broker" as the dispatch class.
 3. In the extension parameters, set the application name you created to applicationName. By default, it is "/exml-api".
 

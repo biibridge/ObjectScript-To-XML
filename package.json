@@ -2,7 +2,7 @@
   "name": "objectscript-to-xml",
   "displayName": "ObjectScript to XML",
   "description": "Exporting InterSystems Object Scripts in XML",
-  "version": "1.0.3",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.95.0"
   },
