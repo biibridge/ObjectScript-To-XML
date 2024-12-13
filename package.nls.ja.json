@@ -1,0 +1,9 @@
+{
+    "objectscript-to-xml.exportXML": "XML形式でエクスポート",
+    "objectscript-to-xml.applicationName": "ウェブ・アプリケーション名",
+    "objectscript-to-xml.applicationName.description": "作成したウェブ・アプリケーション名を指定します。",
+    "objectscript-to-xml.exportDir": "エクスポート先",
+    "objectscript-to-xml.exportDir.description": "エクスポートした XML ファイルを配置する場所を指定します。",
+    "objectscript-to-xml.bundled": "一つの XML ファイルにまとめる",
+    "objectscript-to-xml.bundled.description": "一つの XML ファイルに複数のクラスを含めます。"
+}

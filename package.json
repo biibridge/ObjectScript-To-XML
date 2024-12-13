@@ -21,7 +21,7 @@
     "commands": [
       {
         "command": "objectscript-to-xml.exportXML",
-        "title": "ObjectScript Export XML"
+        "title": "%objectscript-to-xml.exportXML%"
       }
     ],
     "menus": {
@@ -29,14 +29,14 @@
         {
           "when": "resourceLangId == objectscript-class",
           "command": "objectscript-to-xml.exportXML",
-          "group": "bicansaxml@1"
+          "group": "BBObjectXMLGroup@1"
         }
       ],
       "editor/context": [
         {
           "when": "resourceLangId == objectscript-class",
           "command": "objectscript-to-xml.exportXML",
-          "group": "bicansaxml@1"
+          "group": "BBObjectXMLGroup@1"
         }
       ]
     },
@@ -51,18 +51,21 @@
       "properties": {
         "objectscript-to-xml.applicationName": {
           "type": "string",
-          "default": "exml-api",
-          "description": "Specify the name of the web application."
+          "title": "%objectscript-to-xml.applicationName%",
+          "default": "/exml-api",
+          "description": "%objectscript-to-xml.applicationName.description%"
         },
         "objectscript-to-xml.exportDir": {
           "type": "string",
+          "title": "%objectscript-to-xml.exportDir%",
           "default": "exports",
-          "description": "Specify the location where you want to place the exported XML file."
+          "description": "%objectscript-to-xml.exportDir.description%"
         },
         "objectscript-to-xml.bundled": {
           "type": "boolean",
+          "title": "%objectscript-to-xml.bundled%",
           "default": false,
-          "description": "Include multiple classes in a single XML file."
+          "description": "%objectscript-to-xml.bundled.description%"
         }
       }
     }

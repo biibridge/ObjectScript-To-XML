@@ -1,0 +1,9 @@
+{
+    "objectscript-to-xml.exportXML": "ObjectScript Export XML",
+    "objectscript-to-xml.applicationName": "Web Application NAme",
+    "objectscript-to-xml.applicationName.description": "Specify the name of the web application.",
+    "objectscript-to-xml.exportDir": "Export Directory",
+    "objectscript-to-xml.exportDir.description": "Specify the location where you want to place the exported XML file.",
+    "objectscript-to-xml.bundled": "Bundled into a single XML file",
+    "objectscript-to-xml.bundled.description": "Include multiple classes in a single XML file."
+}
