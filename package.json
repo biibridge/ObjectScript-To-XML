@@ -2,7 +2,7 @@
   "name": "objectscript-to-xml",
   "displayName": "ObjectScript to XML",
   "description": "Exporting InterSystems Object Scripts in XML",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "engines": {
     "vscode": "^1.95.0"
   },
@@ -45,7 +45,27 @@
         "command": "objectscript-to-xml.exportXML",
         "key": "ctrl+x"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "objectscript-to-xml",
+      "properties": {
+        "objectscript-to-xml.applicationName": {
+          "type": "string",
+          "default": "exml-api",
+          "description": "Specify the name of the web application."
+        },
+        "objectscript-to-xml.exportDir": {
+          "type": "string",
+          "default": "exports",
+          "description": "Specify the location where you want to place the exported XML file."
+        },
+        "objectscript-to-xml.bundled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Include multiple classes in a single XML file."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
