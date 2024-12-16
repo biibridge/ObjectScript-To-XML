@@ -4,7 +4,7 @@
   "description": "Exporting InterSystems Object Scripts in XML",
   "version": "1.0.0",
   "engines": {
-    "vscode": "^1.95.0"
+    "vscode": "^1.80.0"
   },
   "publisher": "BiiBridge",
   "icon": "icon/icon.png",
